@@ -43,7 +43,7 @@ jobs:
           DASHBOARD_TOKEN: test-dashboard-token
           RATE_LIMIT_ENABLED: "false"
         run: |
-          pytest -v --tb=short --cov=src --cov-report=term-missing --cov-fail-under=80
+          pytest -v --tb=short --cov --cov-report=term-missing --cov-fail-under=80
 
       - name: Upload coverage report
         if: matrix.python-version == '3.11'

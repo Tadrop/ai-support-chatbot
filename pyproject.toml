@@ -20,6 +20,25 @@ markers = [
     "integration: tests that hit external services (Pinecone, Voyage, Claude)",
 ]
 
+[tool.coverage.run]
+source = ["src"]
+# These modules wrap real external APIs (Claude, Pinecone, Voyage AI, Playwright).
+# They are exercised only in integration tests; omitting them keeps the unit-test
+# coverage gate meaningful rather than artificially deflated.
+omit = [
+    "src/chat/claude_client.py",
+    "src/chat/prompt.py",
+    "src/index/pinecone_client.py",
+    "src/ingest/crawler.py",
+    "src/ingest/embedder.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+]
+
 [tool.ruff]
 line-length = 100
 target-version = "py310"
