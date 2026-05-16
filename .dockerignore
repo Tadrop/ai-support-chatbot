@@ -1,0 +1,50 @@
+# Keep the build context small (faster builds, smaller images).
+
+# --- Python / venv ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.python-version
+
+# --- Tests + dev tooling ---
+tests/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+htmlcov/
+coverage.xml
+
+# --- Docs / scratch ---
+*.md
+!README.md
+
+# --- Local data ---
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+logs/
+.crawl_cache/
+ingest_state.json
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Git ---
+.git/
+.gitignore
+
+# --- Docker (don't ship Dockerfiles inside images) ---
+Dockerfile*
+docker-compose*
+.dockerignore

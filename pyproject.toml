@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "greenleaf-chatbot"
+version = "0.1.0"
+description = "Grounded RAG customer service chatbot for GreenLeaf Garden Supplies"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-ra --strict-markers"
+markers = [
+    "integration: tests that hit external services (Pinecone, Voyage, Claude)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pyright]
+include = ["src", "tests"]
+extraPaths = ["."]
+pythonVersion = "3.13"
+pythonPath = "C:/Users/user/AppData/Local/Programs/Python/Python313/python.exe"

@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  test:
+    name: Lint + Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint (ruff)
+        run: ruff check src tests
+
+      - name: Test (pytest + coverage)
+        env:
+          # Fake credentials — the test suite never calls a real API.
+          ANTHROPIC_API_KEY: sk-ant-test-key-1234567890
+          VOYAGE_API_KEY: pa-test-key
+          PINECONE_API_KEY: pcsk-test-key-1234567890
+          CRAWL_ROOT_URL: https://example.test
+          APP_ENV: dev
+          LOG_LEVEL: WARNING
+          DASHBOARD_TOKEN: test-dashboard-token
+          RATE_LIMIT_ENABLED: "false"
+        run: |
+          pytest -v --tb=short --cov=src --cov-report=term-missing --cov-fail-under=80
+
+      - name: Upload coverage report
+        if: matrix.python-version == '3.11'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: .coverage
+          retention-days: 7

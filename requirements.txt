@@ -1,0 +1,31 @@
+# --- Core runtime ---
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+
+# --- AI / RAG ---
+anthropic==0.42.0
+voyageai==0.3.2
+pinecone==5.4.2
+tiktoken==0.8.0          # token counting for chunk sizing
+
+# --- Ingestion ---
+playwright==1.49.1
+beautifulsoup4==4.12.3
+lxml==5.3.0
+httpx==0.28.1
+
+# --- Utilities ---
+tenacity==9.0.0          # retry with backoff for API calls
+structlog==24.4.0        # structured JSON logging
+pyyaml==6.0.2
+slowapi==0.1.9           # per-IP rate limiting for FastAPI
+
+# --- Dev / test ---
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+respx==0.22.0            # httpx mocking for tests
+ruff==0.8.6              # linter / formatter

@@ -1,0 +1,57 @@
+# =============================================================================
+# Dockerfile.api — chat backend (FastAPI + uvicorn)
+#
+# Does NOT include Playwright/Chromium (the ingest pipeline lives in a
+# separate, much larger image — see Dockerfile.ingest).
+#
+# Build:  docker build -f Dockerfile.api -t greenleaf-api .
+# Run:    docker run --env-file .env -p 8000:8000 greenleaf-api
+# =============================================================================
+
+FROM python:3.10-slim AS base
+
+# Don't write .pyc, flush stdout immediately (so logs appear in real time),
+# disable pip's version-check noise.
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+# --- system deps for some of the wheels (lxml, etc.) ---
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        curl \
+        ca-certificates \
+        libxml2 \
+        libxslt1.1 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# --- install Python deps first so this layer is cached on src/ changes ---
+COPY requirements.txt ./
+# The API container doesn't need Playwright — strip it to keep the image small.
+RUN sed -i '/^playwright==/d' requirements.txt \
+ && pip install -r requirements.txt
+
+# --- copy app code ---
+COPY src/ ./src/
+COPY pyproject.toml ./
+
+# --- non-root user ---
+RUN useradd --create-home --shell /bin/bash --uid 1000 appuser \
+ && mkdir -p /app/data \
+ && chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+
+# --- healthcheck against /health ---
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -fsS http://localhost:8000/health || exit 1
+
+# 2 workers is a safe default for a small VM; override at runtime if needed.
+CMD ["uvicorn", "src.chat.app:app", \
+     "--host", "0.0.0.0", "--port", "8000", \
+     "--workers", "2", \
+     "--proxy-headers", "--forwarded-allow-ips=*"]

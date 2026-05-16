@@ -1,0 +1,35 @@
+# =============================================================================
+# Dockerfile.ingest — weekly crawler / chunker / embedder / upserter
+#
+# Uses Microsoft's official Playwright Python image — already has Chromium
+# and all required system libs. Larger than the API image (~1.5 GB) but only
+# runs once a week via cron, so size matters less.
+#
+# Build: docker build -f Dockerfile.ingest -t greenleaf-ingest .
+# Run:   docker run --env-file .env --rm greenleaf-ingest
+#        docker run --env-file .env --rm greenleaf-ingest --dry-run
+# =============================================================================
+
+FROM mcr.microsoft.com/playwright/python:v1.49.1-jammy
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+COPY src/ ./src/
+COPY pyproject.toml ./
+
+# The Playwright base image runs as root by default; create + switch to a
+# non-root user, keeping the pre-installed browser cache accessible.
+RUN useradd --create-home --shell /bin/bash --uid 1000 appuser \
+ && chown -R appuser:appuser /app /ms-playwright 2>/dev/null || true
+USER appuser
+
+# The CLI accepts flags: --dry-run, --max-pages N. Pass them to `docker run`.
+ENTRYPOINT ["python", "-m", "src.ingest.pipeline"]
