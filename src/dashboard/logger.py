@@ -5,8 +5,6 @@ from __future__ import annotations
 import json
 import sqlite3
 from datetime import datetime, timezone
-from functools import lru_cache
-
 from src.config import get_settings
 from src.dashboard.db import get_connection
 from src.logging_setup import get_logger

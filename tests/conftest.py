@@ -25,8 +25,8 @@ for k, v in _DEFAULTS.items():
     os.environ.setdefault(k, v)
 
 # Make sure src is importable when running pytest from project root.
-import sys
-from pathlib import Path
+import sys  # noqa: E402
+from pathlib import Path  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:

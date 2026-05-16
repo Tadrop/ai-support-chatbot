@@ -8,7 +8,6 @@ pass `:memory:` to get an isolated in-memory database.
 from __future__ import annotations
 
 import sqlite3
-from pathlib import Path
 
 
 _DDL = """\

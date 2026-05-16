@@ -139,7 +139,6 @@ async def test_rerun_with_changed_page_reembeds_only_that_page():
         embedder=embedder,
         index=index,
     )
-    ids_after_first = index.stored_ids()
     embed_after_first = embedder.chunks_embedded
 
     # Second run: shipping page has changed, returns page is the same.
